@@ -5,25 +5,32 @@ from hash_gen import hash_gen as hg
 from tx_gen import tx_gen, tx_con
 from nacl.encoding import HexEncoder
 from nacl.signing import SigningKey, VerifyKey
+from node import node
 
 # FIXME: when using random keys, tx_con will not work
 
 
 def main():
   keys = key_gen(False)
+  init_tx(keys)
   gen_genesis_block()
+  with open("transactions.json", "r") as f:
+    utp_json = f.read()
+  with open("genesis_block.json", "r") as f:
+    gb = f.read()
+  node(gb, utp_json)
 
 
 def init_tx(keys):
   tx_gen(keys)
   tx_con(["6d401ad942eda74625767af121a7b74607f2636a1168aed49e7bcdc3aa525bc5"],
-         [(10, keys[1].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
+         [(20, keys[1].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
           (80, keys[0].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
          keys[0])
-  tx_con(["dffe13d165058a11070c084bacf2e98080ab6821a084fd09b5a347bc20e636fb"],
+  tx_con(["6d401ad942eda74625767af121a7b74607f2636a1168aed49e7bcdc3aa525bc5"],
          [(50, keys[2].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
           (80, keys[1].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
-         keys[2])
+         keys[0])
 
 
 def gen_genesis_block():

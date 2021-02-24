@@ -13,16 +13,31 @@ bc = blockchain
 """
 
 def node(gb, utp_json):
-  with open("transactions.json", "r"):
-    utp_json = f.read()
-  utp_list = json.dumps(utp_json)
+
+  """
+  gb: genesis block
+
+  utp_json: unverified transactions pool in json format
+  """
+  bc = [json.loads(gb)]
+  utp_list = json.loads(utp_json)
   vtp_list = []
 
-  while not utp_list:
+  # Special treatment for first transaction
+  tx_dict = utp_list.pop(0)
+  if(not tx_vfy(tx_dict, vtp_list, bc, 1)):
+    print("found invalid transaction")
+  print("tx passed")
+  vtp_list.append(tx_dict)
+  
+  # Normal transactions
+  while utp_list:
     tx_dict = utp_list.pop(0)
-    if(not tx_vfy(tx_dict, vtp_list)):
+    if(not tx_vfy(tx_dict, vtp_list, bc)):
       print("found invalid transaction")
       continue
+    print("tx passed")
+    vtp_list.append(tx_dict)
 
 
   
