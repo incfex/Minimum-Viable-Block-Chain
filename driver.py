@@ -25,6 +25,7 @@ def init_tx(keys):
           (80, keys[1].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
          keys[2])
 
+
 def gen_genesis_block():
   g_block = {
       "tx": sha256(b'BABYLON STAGE34').hexdigest(),
@@ -33,7 +34,8 @@ def gen_genesis_block():
       "pow": sha256(b'A Midsummer Nights Dream').hexdigest()
   }
   g_block_json = json.dumps(g_block)
-  print(g_block_json)
+  with open("genesis_block.json", "w") as f:
+    f.write(g_block_json)
 
 
 def key_gen(new):
