@@ -74,6 +74,10 @@ def tx_con(txn, rx, s_key):
     "sig": sig
   }
   print(tx)
+  txs_list.append(tx)
+  txs_json = json.dumps(txs_list)
+  with open('transactions.json', "w") as f:
+    f.write(txs_json)
 
 
 def main():
