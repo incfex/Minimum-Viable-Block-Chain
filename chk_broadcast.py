@@ -9,7 +9,7 @@ def chk_broadcast(bqs, tails_list, blk_list, utp_list):
   """
   bqs: broadcast queue for itself
 
-  tails_list: current tail tuple list [(tx, count)]
+  tails_list: current tail tuple list [(pow, count)]
     tx: transaction number of block
     count: how long is the chain
 
@@ -32,7 +32,7 @@ def chk_broadcast(bqs, tails_list, blk_list, utp_list):
     print("new block pow failed!")
     return (tails_list)
   # Verify prev
-  b_prev = next(b for b in blk_list if b["tx"] == bb_dict["prev"], 0)
+  b_prev = next(b for b in blk_list if b["pow"] == bb_dict["prev"], 0)
   if not b_prev:
     print("previous block not found!")
     return (tails_list)
@@ -50,11 +50,11 @@ def chk_broadcast(bqs, tails_list, blk_list, utp_list):
   # Check if the prev is one of the tails
   # If not found, add to the tail, set counter to 1
   if next(t[0] for t in tails_list if t[0] == bb_dict["prev"], 0):
-    tails_list.append((bb_dict["tx"], 1))
+    tails_list.append((bb_dict["pow"], 1))
   # If found in tail, counter increase by 1
   tail = [(bb_dict["prev"],t[1]+1) for t in tails_list if t[0] == bb_dict["prev"]]
 
-  # Sort the tail list based on the counter before return
+  # Sort the tail list based on the counter
   tail.sort(key = lambda x:x[1])
   
   print(tail)
