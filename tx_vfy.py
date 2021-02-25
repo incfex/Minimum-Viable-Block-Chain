@@ -38,7 +38,7 @@ def tx_vfy(tx_dict, vtp_list, bc, ignore=0, is_utp=0):
   # Check each number in the input exist as a transaction already on the blockchain
   for tx in tx_dict["input"]:
     b_input = next((b for b in bc if b["tx"] == tx["number"]), 0)
-    if b_input:
+    if not b_input:
       print("input transaction is not found in the blockchain")
       return 0
 

@@ -1,5 +1,5 @@
 #!env/bin/python3.9
-import json
+import json, threading, queue
 from hashlib import sha256
 from hash_gen import hash_gen as hg
 from tx_gen import tx_gen, tx_con
@@ -18,7 +18,9 @@ def main():
     utp_json = f.read()
   with open("genesis_block.json", "r") as f:
     gb = f.read()
-  node(gb, utp_json)
+  q1 = queue.Queue()
+  q2 = queue.Queue()
+  node(gb, utp_json, [q1], q2)
 
 
 def init_tx(keys):
@@ -29,7 +31,7 @@ def init_tx(keys):
          keys[0])
   tx_con(["6d401ad942eda74625767af121a7b74607f2636a1168aed49e7bcdc3aa525bc5"],
          [(50, keys[2].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
-          (80, keys[1].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
+          (50, keys[1].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
          keys[0])
 
 
