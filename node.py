@@ -32,7 +32,6 @@ def node(gb, utp_json):
     print("tx passed")
     vtp_list.append(tx_dict)
     virgin = 0
-  
   # Normal transactions
   else: 
     while utp_list:
@@ -60,7 +59,7 @@ def node(gb, utp_json):
     "pow" = pow_cur
   }
 
-  
+
 
 
 def main():
