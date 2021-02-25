@@ -4,8 +4,10 @@ from hash_gen import hash_gen as hg
 from nacl.signing import SigningKey, VerifyKey
 from nacl.encoding import HexEncoder
 
+#TODO:
+# Check for double spend
 
-def tx_vfy(tx_dict, vtp_list, bc, ignore=0):
+def tx_vfy(tx_dict, vtp_list, bc, ignore=0, is_utp=0):
   """
   tx_dict: transaction input in dictionary format
 
@@ -14,6 +16,9 @@ def tx_vfy(tx_dict, vtp_list, bc, ignore=0):
   bc: blockchain in dictionary format
 
   ignore: ignore the input/output value check, default to 0; turn on for first tx
+  
+  is_utp: is calling from broadcasted block check, in this case, do not perform 
+  already in blockchain check, default to 0.
   """
 
   # Check the number hash is correct
@@ -24,9 +29,10 @@ def tx_vfy(tx_dict, vtp_list, bc, ignore=0):
     return 0
 
   # Check transaction is not already on the blockchain
-  if not next((b for b in bc if b["tx"] == tx_dict["number"]), 1):
-    print("transaction is already on the blockchain!")
-    return 0
+  if not is_utp:
+    if not next((b for b in bc if b["tx"] == tx_dict["number"]), 1):
+      print("transaction is already on the blockchain!")
+      return 0
   
   input_value = 0
   # Check each number in the input exist as a transaction already on the blockchain

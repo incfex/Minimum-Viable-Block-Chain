@@ -1,7 +1,5 @@
 import json
-from hashlib import sha256
 from hash_gen import hash_gen as hg
-from tx_gen import tx_gen, tx_con
 from nacl.encoding import HexEncoder
 from nacl.signing import SigningKey, VerifyKey
 from tx_vfy import tx_vfy
@@ -12,12 +10,16 @@ gb = genesis block
 bc = blockchain
 """
 
-def node(gb, utp_json):
+def node(gb, utp_json, bq_list, bqs):
 
   """
   gb: genesis block
 
   utp_json: unverified transactions pool in json format
+
+  bq_list: list of broadcast queues except itself
+
+  bqs: broadcast queue for itself
   """
   virgin = 1
   bc = [json.loads(gb)]
@@ -58,6 +60,11 @@ def node(gb, utp_json):
     "nonce" = nonce,
     "pow" = pow_cur
   }
+  block_json = json.dumps(block)
+
+  # Broadcast block
+  for q in bq_list:
+    q.put(block_json)
 
 
 
