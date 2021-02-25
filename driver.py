@@ -1,11 +1,14 @@
 #!env/bin/python3.9
-import json, threading, queue
+import json, queue
 from hashlib import sha256
 from hash_gen import hash_gen as hg
 from tx_gen import tx_gen, tx_con
 from nacl.encoding import HexEncoder
 from nacl.signing import SigningKey, VerifyKey
 from node import node
+from threading import Thread
+import time
+
 
 # FIXME: when using random keys, tx_con will not work
 
@@ -18,10 +21,19 @@ def main():
     utp_json = f.read()
   with open("genesis_block.json", "r") as f:
     gb = f.read()
-  q1 = queue.Queue()
-  q2 = queue.Queue()
-  node(gb, utp_json, [q1], q2)
-
+  
+  if (0):
+    q1 = queue.Queue()
+    q2 = queue.Queue()
+    node(gb, utp_json, [q1, q2], 1)
+  else:
+    q_list = [queue.Queue() for i in range(8)]
+    for i in range(8):
+      worker = Thread(target=node, args=(gb, utp_json, q_list, i))
+      worker.setDaemon(True)
+      worker.start()
+      worker.join()
+  
 
 def init_tx(keys):
   tx_gen(keys)

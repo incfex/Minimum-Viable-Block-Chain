@@ -11,7 +11,7 @@ gb = genesis block
 blk_list = blocks list
 """
 
-def node(gb, utp_json, bq_list, bqs):
+def node(gb, utp_json, bq_list, proc):
 
   """
   gb: genesis block
@@ -20,13 +20,17 @@ def node(gb, utp_json, bq_list, bqs):
 
   bq_list: list of broadcast queues except itself
 
-  bqs: broadcast queue for itself
+  proc: process number
   """
   virgin = 1
   blk_list = [json.loads(gb)]
   utp_list = json.loads(utp_json)
   vtp_list = []
   tails_list = []
+  # bqs: broadcast queue for itself
+  bqs = bq_list[proc]
+  # Pick out itself from the queue list
+  bq_list = bq_list[:proc]+bq_list[(proc+1):]
 
   while len(utp_list) > 0:
 
@@ -35,7 +39,7 @@ def node(gb, utp_json, bq_list, bqs):
       tx_dict = utp_list.pop(0)
       if(not tx_vfy(tx_dict, vtp_list, blk_list, 1)):
         print("found invalid transaction")
-      print("tx passed")
+      #print("tx passed")
       vtp_list.append(tx_dict)
       virgin = 0
     # Normal transactions
@@ -44,7 +48,7 @@ def node(gb, utp_json, bq_list, bqs):
       if(not tx_vfy(tx_dict, vtp_list, blk_list)):
         print("found invalid transaction")
         continue
-      print("tx passed")
+      #print("tx passed")
       vtp_list.append(tx_dict)
     # Construct block
     tx = tx_dict["number"]
@@ -77,11 +81,17 @@ def node(gb, utp_json, bq_list, bqs):
       q.put(block_json)
 
     # Check for broadcast
-    tails_list, blk_list = chk_broadcast(bqs, tails_list, blk_list, utp_list)
+    tails_list, blk_list = chk_broadcast(bqs, tails_list, blk_list, utp_list, vtp_list)
 
     # revoke invalid transactions
     vtp_list, utp_list = revoke_tx(tails_list, vtp_list, utp_list, blk_list)
 
+    blk_json = json.dumps(blk_list)
+    file_string = "./blocks/block" + str(proc)
+    print(blk_json)
+    with open(file_string, "w") as f:
+      f.write(blk_json)
+    
 
 def revoke_tx(tails_list, vtp_list, utp_list, blk_list):
   # Pop the longest tail in the chain

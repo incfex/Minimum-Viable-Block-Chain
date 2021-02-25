@@ -5,7 +5,7 @@ from nacl.signing import SigningKey, VerifyKey
 from tx_vfy import tx_vfy
 
 
-def chk_broadcast(bqs, tails_list, blk_list, utp_list):
+def chk_broadcast(bqs, tails_list, blk_list, utp_list, vtp_list):
   """
   bqs: broadcast queue for itself
 
@@ -19,6 +19,7 @@ def chk_broadcast(bqs, tails_list, blk_list, utp_list):
   """
   try:
     bb_json = bqs.get(False)
+    bqs.task_done()
   except:
     return (tails_list, blk_list)
   print("got new broadcast")
@@ -37,11 +38,15 @@ def chk_broadcast(bqs, tails_list, blk_list, utp_list):
     print("previous block not found!")
     return (tails_list, blk_list)
   # Verify transaction
-  tx = next((t for t in utp_list if bb_dict["tx"] == t["number"]), 0)
-  if not tx:
-    print("transaction in the block not found!")
+  tx_u = next((t for t in utp_list if bb_dict["tx"] == t["number"]), 0)
+  tx_v = next((t for t in vtp_list if bb_dict["tx"] == t["number"]), 0)
+  if tx_u:
+    txv_result = tx_vfy(tx_u, utp_list, blk_list, 0, 1)
+  elif tx_v:
+    txv_result = tx_vfy(tx_v, utp_list, blk_list, 0, 1)
+  else:
+    print("transaction not found in utp!")
     return (tails_list, blk_list)
-  txv_result = tx_vfy(tx, utp_list, blk_list, 0, 1)
   if not txv_result:
     print("transaction verification failed!")
     return (tails_list, blk_list)
