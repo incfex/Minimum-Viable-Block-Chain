@@ -3,6 +3,7 @@ from hash_gen import hash_gen as hg
 from nacl.encoding import HexEncoder
 from nacl.signing import SigningKey, VerifyKey
 from tx_vfy import tx_vfy
+from chk_broadcast import chk_broadcast
 
 """
 utp = unverified transactions pool
@@ -25,6 +26,7 @@ def node(gb, utp_json, bq_list, bqs):
   bc = [json.loads(gb)]
   utp_list = json.loads(utp_json)
   vtp_list = []
+  tails_list = []
 
   # Special treatment for first transaction
   if virgin:
@@ -65,6 +67,8 @@ def node(gb, utp_json, bq_list, bqs):
   # Broadcast block
   for q in bq_list:
     q.put(block_json)
+
+  chk_broadcast(bqs, tails_list, bc, utp_list)
 
 
 
