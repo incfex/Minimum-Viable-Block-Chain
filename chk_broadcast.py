@@ -58,14 +58,14 @@ def chk_broadcast(bqs, tails_list, blk_list, utp_list, vtp_list):
     tails_list.append(tuple((bb_dict["pow"], 1)))
   else:
   # If found in tail, counter increase by 1
-    tails_list = [(bb_dict["prev"],t[1]+1) for t in tails_list if t[0] == bb_dict["prev"]]
+    tails_list = [(bb_dict["pow"],t[1]+1) for t in tails_list if t[0] == bb_dict["prev"]]
 
   # Sort the tail list based on the counter
   tails_list.sort(key = lambda x:x[1])
 
   #print(tails_list)
-  
-  blk_list.append(bb_dict)
+  if not next((b for b in blk_list if b["pow"] == bb_dict["pow"]),0):
+    blk_list.append(bb_dict)
 
   return (tails_list, blk_list)
   

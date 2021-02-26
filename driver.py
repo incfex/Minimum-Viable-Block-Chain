@@ -28,7 +28,7 @@ def main():
     node(gb, utp_json, [q1, q2], 1)
   else:
     q_list = [queue.Queue() for i in range(8)]
-    for i in range(8):
+    for i in range(2):
       worker = Thread(target=node, args=(gb, utp_json, q_list, i))
       worker.setDaemon(True)
       worker.start()
