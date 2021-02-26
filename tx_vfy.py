@@ -56,7 +56,7 @@ def tx_vfy(tx_dict, vtp_list, bc, ignore=0, is_utp=0):
       print("transaction value and pubkey does not match!")
       return 0
     # Check sig with pubkey
-    sig_o = vtp_tx["sig"].encode('utf-8')
+    sig_o = tx_dict["sig"].encode('utf-8')
     usig_n = hg(vtp_tx["input"], vtp_tx["output"]).encode('utf-8')
     verify_key = VerifyKey(t_output["pubkey"].encode('utf-8'), encoder=HexEncoder)
     try:
@@ -66,6 +66,11 @@ def tx_vfy(tx_dict, vtp_list, bc, ignore=0, is_utp=0):
       return 0
     # Add up input value
     input_value += tx["output"]["value"]
+
+    # Check double spend
+    if next((t for t in vtp_list if next((True for t2 in t["input"] if t2["output"]["pubkey"] == tx["output"]["pubkey"]), False)), False):
+      print("Double Spend!")
+      return 0
 
   # Add up output value
   output_value = 0

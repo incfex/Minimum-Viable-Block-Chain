@@ -22,7 +22,7 @@ def main():
   with open("genesis_block.json", "r") as f:
     gb = f.read()
   
-  if (0):
+  if (1):
     q1 = queue.Queue()
     q2 = queue.Queue()
     node(gb, utp_json, [q1, q2], 1)
@@ -37,14 +37,75 @@ def main():
 
 def init_tx(keys):
   tx_gen(keys)
+  #Valid
   tx_con(["6d401ad942eda74625767af121a7b74607f2636a1168aed49e7bcdc3aa525bc5"],
          [(20, keys[1].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
           (80, keys[0].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
          keys[0])
+  #Valid
   tx_con(["6d401ad942eda74625767af121a7b74607f2636a1168aed49e7bcdc3aa525bc5"],
          [(50, keys[2].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
           (50, keys[1].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
-         keys[0])
+         keys[1])
+  #Double Spend
+  tx_con(["6d401ad942eda74625767af121a7b74607f2636a1168aed49e7bcdc3aa525bc5"],
+         [(50, keys[1].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
+          (50, keys[2].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
+         keys[1])
+  """
+  tx_con(["7e2f1b71647f220ae57229709346b08b43826845983a1c3a1654da4eea7095c0"],
+         [(10, keys[3].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
+          (10, keys[4].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
+         keys[1])
+  tx_con(["9e97af54039674af7c791c5b6586b8901ffdc6f9a47d0e8d111255b687101d8d"],
+         [(10, keys[5].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
+          (10, keys[6].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
+         keys[2])
+  tx_con(["9e97af54039674af7c791c5b6586b8901ffdc6f9a47d0e8d111255b687101d8d"],
+         [(10, keys[7].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
+          (10, keys[1].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
+         keys[2])
+  tx_con(["143ecdd14e59bdf8bbce05776ced9c457af906fee6e4713a2a06a8a11c1fba1a"],
+         [(10, keys[5].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
+          (10, keys[6].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
+         keys[2])
+  tx_con(["143ecdd14e59bdf8bbce05776ced9c457af906fee6e4713a2a06a8a11c1fba1a"],
+         [(10, keys[7].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
+          (10, keys[1].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
+         keys[2])
+  tx_con(["9e97af54039674af7c791c5b6586b8901ffdc6f9a47d0e8d111255b687101d8d"],
+         [(10, keys[5].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
+          (10, keys[6].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
+         keys[2])
+  tx_con(["9e97af54039674af7c791c5b6586b8901ffdc6f9a47d0e8d111255b687101d8d"],
+         [(10, keys[7].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
+          (10, keys[1].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
+         keys[2])
+  tx_con(["dfc36227c6c343117e9ac2c3f9d2d60f24bb34ea5b074d3923cf5632d66856d3"],
+         [(10, keys[5].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
+          (10, keys[6].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
+         keys[3])
+  tx_con(["dfc36227c6c343117e9ac2c3f9d2d60f24bb34ea5b074d3923cf5632d66856d3"],
+         [(10, keys[7].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
+          (10, keys[1].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
+         keys[3])
+  tx_con(["0b3a8ac474a0fe429808ed05b6bfd0f7c2ad0985aad8ad6994005bf3f0cbad6c"],
+         [(10, keys[2].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
+          (10, keys[6].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
+         keys[5])
+  tx_con(["0b3a8ac474a0fe429808ed05b6bfd0f7c2ad0985aad8ad6994005bf3f0cbad6c"],
+         [(10, keys[7].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
+          (10, keys[1].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
+         keys[5])
+  tx_con(["82d19ef94a2eff0e18b63c476f5b89779f7651691ae3bb18bb54056ae1a2aaac"],
+         [(10, keys[2].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
+          (10, keys[3].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
+         keys[6])
+  tx_con(["82d19ef94a2eff0e18b63c476f5b89779f7651691ae3bb18bb54056ae1a2aaac"],
+         [(10, keys[7].verify_key.encode(encoder=HexEncoder).decode('utf-8')),
+          (10, keys[2].verify_key.encode(encoder=HexEncoder).decode('utf-8'))],
+         keys[6])
+  """
 
 
 def gen_genesis_block():
