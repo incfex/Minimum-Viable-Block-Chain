@@ -21,6 +21,8 @@ def node(gb, utp_json, bq_list, proc):
   bq_list: list of broadcast queues except itself
 
   proc: process number
+
+  The third node is malicious
   """
   virgin = 1
   blk_list = [json.loads(gb)]
@@ -33,23 +35,20 @@ def node(gb, utp_json, bq_list, proc):
   bq_list = bq_list[:proc]+bq_list[(proc+1):]
 
   while len(utp_list) > 0:
-  #for asdf in range(2):
 
     # Special treatment for first transaction
     if virgin:
       tx_dict = utp_list.pop(0)
-      if(not tx_vfy(tx_dict, vtp_list, blk_list, 1)):
-        print("found invalid transaction")
-      #print("tx passed")
+      #if(not tx_vfy(tx_dict, vtp_list, blk_list, 1)):
+        ###print("found invalid transaction")
       vtp_list.append(tx_dict)
       virgin = 0
     # Normal transactions
     else: 
       tx_dict = utp_list.pop(0)
       if(not tx_vfy(tx_dict, vtp_list, blk_list)):
-        print("found invalid transaction")
+        #print("found invalid transaction")
         continue
-      #print("tx passed")
       vtp_list.append(tx_dict)
     # Construct block
     tx = tx_dict["number"]
@@ -62,7 +61,11 @@ def node(gb, utp_json, bq_list, proc):
     nonce = 0
     while pow_cur >= pow_tar:
       nonce += 1
-      pow_cur = hg(tx,prev,nonce)
+      # Malicious node 2
+      if proc==2:
+        pow_cur = hg(tx+"1", prev, nonce)
+      else:
+        pow_cur = hg(tx,prev,nonce)
     block = {
       "tx": tx,
       "prev": prev,
@@ -84,17 +87,10 @@ def node(gb, utp_json, bq_list, proc):
 
     # Check for broadcast
     tails_list, blk_list = chk_broadcast(bqs, tails_list, blk_list, utp_list, vtp_list)
-    print("\nblk_list")
-    print(blk_list)
-    print("\nvtp")
-    print(vtp_list)
     # revoke invalid transactions
     vtp_list, utp_list = revoke_tx(tails_list, vtp_list, utp_list, blk_list)
-    print(vtp_list)
-
   blk_json = json.dumps(blk_list)
   file_string = "./blocks/block" + str(proc)
-  #print(blk_json)
   with open(file_string, "w") as f:
     f.write(blk_json)
     
@@ -102,8 +98,6 @@ def node(gb, utp_json, bq_list, proc):
 def revoke_tx(tails_list, vtp_list, utp_list, blk_list):
   # get the longest tail in the chain
   tails_list.sort(key = lambda x:x[1])
-  print("\ntails_list")
-  print(tails_list)
   long_t = tails_list[-1][0]
   long_c = []
   # The following hash is the prev of genesis block
@@ -113,20 +107,15 @@ def revoke_tx(tails_list, vtp_list, utp_list, blk_list):
       long_c.append(result["tx"])
       long_t = result["prev"]
     else:
-      print("revoke failed! Previous block not found")
+      #print("revoke failed! Previous block not found")
       break
-  print("\nlong_c")
-  print(long_c)
-  print()
   #return(vtp_list, utp_list)
   # Move the tx from vtp to utp if not found in the longest blockchain
   for tx in vtp_list:
     if not next((c for c in long_c if c == tx["number"]), 0):
       vtp_list.remove(tx)
       utp_list.insert(0, tx)
-      print("\ntx")
-      print(tx)
-      print("transaction revoked!")
+      ##print("transaction revoked!")
 
   return(vtp_list, utp_list)
 

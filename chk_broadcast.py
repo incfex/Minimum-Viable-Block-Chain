@@ -22,7 +22,7 @@ def chk_broadcast(bqs, tails_list, blk_list, utp_list, vtp_list):
     bqs.task_done()
   except:
     return (tails_list, blk_list)
-  print("got new broadcast")
+  #print("got new broadcast")
 
   # Process new block
   bb_dict = json.loads(bb_json)
@@ -30,12 +30,12 @@ def chk_broadcast(bqs, tails_list, blk_list, utp_list, vtp_list):
   # Verify pow
   pow_n = hg(bb_dict["tx"], bb_dict["prev"], bb_dict["nonce"])
   if pow_n != bb_dict["pow"]:
-    print("new block pow failed!")
+    #print("new block pow failed!")
     return (tails_list, blk_list)
   # Verify prev
   b_prev = next((b for b in blk_list if b["pow"] == bb_dict["prev"]), 0)
   if not b_prev:
-    print("previous block not found!")
+    #print("previous block not found!")
     return (tails_list, blk_list)
   # Verify transaction
   tx_u = next((t for t in utp_list if bb_dict["tx"] == t["number"]), 0)
@@ -45,10 +45,10 @@ def chk_broadcast(bqs, tails_list, blk_list, utp_list, vtp_list):
   elif tx_v:
     txv_result = tx_vfy(tx_v, utp_list, blk_list, 0, 1)
   else:
-    print("transaction not found in utp!")
+    #print("transaction not found in utp!")
     return (tails_list, blk_list)
   if not txv_result:
-    print("transaction verification failed!")
+    #print("transaction verification failed!")
     return (tails_list, blk_list)
 
   # Append the block to blockchain
@@ -63,7 +63,6 @@ def chk_broadcast(bqs, tails_list, blk_list, utp_list, vtp_list):
   # Sort the tail list based on the counter
   tails_list.sort(key = lambda x:x[1])
 
-  #print(tails_list)
   if not next((b for b in blk_list if b["pow"] == bb_dict["pow"]),0):
     blk_list.append(bb_dict)
 

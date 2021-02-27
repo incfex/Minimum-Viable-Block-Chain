@@ -25,13 +25,13 @@ def tx_vfy(tx_dict, vtp_list, bc, ignore=0, is_utp=0):
   num_o = tx_dict["number"]
   num_n = hg(tx_dict["input"], tx_dict["output"], tx_dict["sig"])
   if num_o != num_n:
-    print("hash num incorrect!")
+    #print("hash num incorrect!")
     return 0
 
   # Check transaction is not already on the blockchain
   if not is_utp:
     if not next((b for b in bc if b["tx"] == tx_dict["number"]), 1):
-      print("transaction is already on the blockchain!")
+      #print("transaction is already on the blockchain!")
       return 0
   
   input_value = 0
@@ -39,13 +39,13 @@ def tx_vfy(tx_dict, vtp_list, bc, ignore=0, is_utp=0):
   for tx in tx_dict["input"]:
     b_input = next((b for b in bc if b["tx"] == tx["number"]), 0)
     if not b_input:
-      print("input transaction is not found in the blockchain")
+      #print("input transaction is not found in the blockchain")
       return 0
 
     # Check each output in the input actually exists in the named transaction
     vtp_tx = next((t for t in vtp_list if t["number"] == tx["number"]), 0)
     if (not vtp_tx):
-      print("transaction does not exist!")
+      #print("transaction does not exist!")
       return 0
     # Check ...value and pubkey
     t_output = next((
@@ -53,7 +53,7 @@ def tx_vfy(tx_dict, vtp_list, bc, ignore=0, is_utp=0):
         if o["pubkey"] == tx["output"]["pubkey"] and
         o["value"] == tx["output"]["value"]), 0)
     if (not t_output):
-      print("transaction value and pubkey does not match!")
+      #print("transaction value and pubkey does not match!")
       return 0
     # Check sig with pubkey
     sig_o = tx_dict["sig"].encode('utf-8')
@@ -62,15 +62,14 @@ def tx_vfy(tx_dict, vtp_list, bc, ignore=0, is_utp=0):
     try:
       usig_o = verify_key.verify(sig_o, encoder=HexEncoder)
     except:
-      print("sig verify failed!")
+      #print("sig verify failed!")
+      return 0
+    # Check double spend
+    if next((t for t in vtp_list if next((True for t2 in t["input"] if t2["output"]["pubkey"] == tx["output"]["pubkey"]), False)), False):
+      #print("Double Spend!")
       return 0
     # Add up input value
     input_value += tx["output"]["value"]
-
-    # Check double spend
-    if next((t for t in vtp_list if next((True for t2 in t["input"] if t2["output"]["pubkey"] == tx["output"]["pubkey"]), False)), False):
-      print("Double Spend!")
-      return 0
 
   # Add up output value
   output_value = 0
@@ -80,7 +79,7 @@ def tx_vfy(tx_dict, vtp_list, bc, ignore=0, is_utp=0):
   if ignore:
     return 1
   if input_value != output_value:
-    print("input output value does not match!")
+    #print("input output value does not match!")
     return 0
 
   return 1
